@@ -7,7 +7,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-        origin: "http://localhost:5173",  // Update this to match your frontend's origin
+        origin: "http://localhost:5173", // Update this to match your frontend's origin
         methods: ["GET", "POST"],
         credentials: true,
         allowedHeaders: ["Content-Type", "Authorization"], // Optional: Specify allowed headers
@@ -16,12 +16,12 @@ const io = new Server(server, {
 
 const userSocketMap = {}; // { userId: socketId }
 
+// Function to get the receiver's socket ID
 export const getReceiverSocketId = (receiverId) => {
     console.log(`Fetching socketId for receiverId: ${receiverId}`);
     console.log(`Current userSocketMap:`, userSocketMap);
     return userSocketMap[receiverId];
 };
-
 
 io.on("connection", (socket) => {
     const userId = socket.handshake.query.userId;
@@ -30,26 +30,25 @@ io.on("connection", (socket) => {
 
     if (userId && userId !== "undefined") {
         userSocketMap[userId] = socket.id;
-        // console.log(`User ${userId} connected and socket ID ${socket.id} added to userSocketMap`);
+        emitActiveUsers();
     } else {
         console.log("User ID is not defined or missing");
     }
-
-    // console.log("Current userSocketMap:", userSocketMap);
-    // Emit currently online users
-    io.emit("getOnlineUsers", Object.keys(userSocketMap));
-    // console.log("Current online users after connection:", Object.keys(userSocketMap));
 
     socket.on("disconnect", () => {
         console.log(`User with socket ID: ${socket.id} disconnected`);
         if (userId) {
             delete userSocketMap[userId];
-            console.log(`User ${userId} with socket ID ${socket.id} has been removed from userSocketMap`);
+            emitActiveUsers();
         }
-        io.emit("getOnlineUsers", Object.keys(userSocketMap));
-        console.log("Current online users after disconnect:", Object.keys(userSocketMap));
     });
 });
 
+// Function to emit the active users list to all connected clients
+const emitActiveUsers = () => {
+    const activeUsers = Object.keys(userSocketMap);
+    io.emit('activeUsers', activeUsers);
+    console.log("Current online users:", activeUsers);
+};
 
 export { app, io, server };

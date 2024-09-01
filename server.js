@@ -16,9 +16,11 @@ dotenv.config();
 const __dirname = path.resolve();
 const PORT = process.env.PORT || 5000;
 
+// console.log("Frontend URL:", process.env.FRONTEND_URL); // Debugging line
+
 // Enable CORS for all routes
 app.use(cors({
-    origin: 'http://localhost:5173',  // Replace with your frontend URL
+    origin: "http://localhost:5173",  // Replace with your frontend URL
     credentials: true  // Enable sending of cookies
 }));
 
