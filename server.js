@@ -20,7 +20,7 @@ const PORT = process.env.PORT || 5000;
 
 // Enable CORS for all routes
 app.use(cors({
-    origin: process.env.FRONTEND_URL,  // Replace with your frontend URL
+    origin: "http://localhost:5173",  // Replace with your frontend URL
     credentials: true  // Enable sending of cookies
 }));
 
